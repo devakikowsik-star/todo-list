@@ -43,7 +43,7 @@
       <!-- Overdue Section -->
       <section class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
         <h3 class="text-lg font-bold text-gray-800 mb-3 flex items-center justify-between">
-          <span>Overdue (<span id="count-overdue"><%= typeof overdueCount !== 'undefined' ? overdueCount : overdueTodos.length %></span>)</span>
+          <span>Overdue (<span id="count-overdue"><%= typeof overdueCount !== 'undefined' ? overdueCount : (overdueTodos ? overdueTodos.length : 0) %></span>)</span>
         </h3>
         <%- include('todos.ejs', { todos: overdueTodos, data: overdueTodos }) %>
       </section>
@@ -51,7 +51,7 @@
       <!-- Due Today Section -->
       <section class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
         <h3 class="text-lg font-bold text-gray-800 mb-3 flex items-center justify-between">
-          <span>Due Today (<span id="count-due-today"><%= typeof dueTodayCount !== 'undefined' ? dueTodayCount : dueTodayTodos.length %></span>)</span>
+          <span>Due Today (<span id="count-due-today"><%= typeof dueTodayCount !== 'undefined' ? dueTodayCount : (dueTodayTodos ? dueTodayTodos.length : 0) %></span>)</span>
         </h3>
         <%- include('todos.ejs', { todos: dueTodayTodos, data: dueTodayTodos }) %>
       </section>
@@ -59,7 +59,7 @@
       <!-- Due Later Section -->
       <section class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
         <h3 class="text-lg font-bold text-gray-800 mb-3 flex items-center justify-between">
-          <span>Due Later (<span id="count-due-later"><%= typeof dueLaterCount !== 'undefined' ? dueLaterCount : dueLaterTodos.length %></span>)</span>
+          <span>Due Later (<span id="count-due-later"><%= typeof dueLaterCount !== 'undefined' ? dueLaterCount : (dueLaterTodos ? dueLaterTodos.length : 0) %></span>)</span>
         </h3>
         <%- include('todos.ejs', { todos: dueLaterTodos, data: dueLaterTodos }) %>
       </section>
