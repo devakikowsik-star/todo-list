@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo Manager</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen text-gray-800">
+  <div class="max-w-2xl mx-auto py-10 px-4">
+    <header class="mb-8">
+      <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">My Todo-List</h1>
+      <p class="text-sm text-gray-500 mt-1">Manage your daily tasks efficiently</p>
+    </header>
+
+    <!-- Create Todo Form -->
+    <section class="bg-white p-5 rounded-lg shadow-sm border border-gray-200 mb-8">
+      <form action="/todos" method="POST" class="flex flex-col sm:flex-row gap-3">
+        <input
+          type="text"
+          name="title"
+          placeholder="What's next?"
+          required
+          class="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+        />
+        <input
+          type="date"
+          name="dueDate"
+          required
+          class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+        />
+        <button
+          type="submit"
+          class="bg-green-600 hover:bg-green-700 text-white font-medium px-5 py-2 rounded transition text-sm shadow-sm"
+        >
+          Add
+        </button>
+      </form>
+    </section>
+
+    <!-- Todo Categories with Counts and Partials -->
+    <main class="space-y-6">
+      <!-- Overdue Section -->
+      <section class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <h3 class="text-lg font-bold text-gray-800 mb-3 flex items-center justify-between">
+          <span>Overdue (<span id="count-overdue"><%= typeof overdueCount !== 'undefined' ? overdueCount : overdueTodos.length %></span>)</span>
+        </h3>
+        <%- include('todos.ejs', { todos: overdueTodos, data: overdueTodos }) %>
+      </section>
+
+      <!-- Due Today Section -->
+      <section class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <h3 class="text-lg font-bold text-gray-800 mb-3 flex items-center justify-between">
+          <span>Due Today (<span id="count-due-today"><%= typeof dueTodayCount !== 'undefined' ? dueTodayCount : dueTodayTodos.length %></span>)</span>
+        </h3>
+        <%- include('todos.ejs', { todos: dueTodayTodos, data: dueTodayTodos }) %>
+      </section>
+
+      <!-- Due Later Section -->
+      <section class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <h3 class="text-lg font-bold text-gray-800 mb-3 flex items-center justify-between">
+          <span>Due Later (<span id="count-due-later"><%= typeof dueLaterCount !== 'undefined' ? dueLaterCount : dueLaterTodos.length %></span>)</span>
+        </h3>
+        <%- include('todos.ejs', { todos: dueLaterTodos, data: dueLaterTodos }) %>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    function updateTodo(id) {
+      const checkbox = document.getElementById(`todo-checkbox-${id}`);
+      fetch(`/todos/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          completed: checkbox.checked,
+        }),
+      })
+      .then((res) => {
+        if (!res.ok) {
+          checkbox.checked = !checkbox.checked;
+        } else {
+          window.location.reload();
+        }
+      })
+      .catch((err) => {
+        console.error('Error updating todo:', err);
+        checkbox.checked = !checkbox.checked;
+      });
+    }
+
+    function deleteTodo(id) {
+      if (confirm('Are you sure you want to delete this todo?')) {
+        fetch(`/todos/${id}`, {
+          method: 'DELETE',
+        })
+        .then((res) => {
+          if (res.ok) {
+            window.location.reload();
+          } else {
+            alert('Failed to delete todo');
+          }
+        })
+        .catch((err) => {
+          console.error('Error deleting todo:', err);
+        });
+      }
+    }
+  </script>
+</body>
+</html>
