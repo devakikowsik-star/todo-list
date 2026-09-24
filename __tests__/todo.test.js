@@ -1,17 +1,18 @@
 const request = require('supertest');
 const cheerio = require('cheerio');
+const bcrypt = require('bcryptjs');
 const app = require('../app');
-const { Todo } = require('../models');
+const { Todo, User } = require('../models');
 
 // Helper to extract CSRF token from HTML view
-async function getCsrfToken(agent) {
-  const res = await agent.get('/').set('Accept', 'text/html');
+async function getCsrfToken(agent, path = '/') {
+  const res = await agent.get(path).set('Accept', 'text/html');
   const $ = cheerio.load(res.text);
   const token = $('input[name="_csrf"]').val();
   return token || '';
 }
 
-describe('Express Todo Manager - Milestone Tests', () => {
+describe('Express Todo Manager - Final Milestone Tests', () => {
   beforeEach(() => {
     jest.spyOn(Todo, 'overdue').mockResolvedValue([]);
     jest.spyOn(Todo, 'dueToday').mockResolvedValue([]);
@@ -52,6 +53,176 @@ describe('Express Todo Manager - Milestone Tests', () => {
     });
   });
 
+  describe('User Authentication & Validation', () => {
+    it('should render signup page with GET /signup', async () => {
+      const res = await request(app)
+        .get('/signup')
+        .expect('Content-Type', /html/)
+        .expect(200);
+
+      expect(res.text).toContain('Create your account');
+      expect(res.text).toContain('name="_csrf"');
+    });
+
+    it('should create a new user on POST /users and redirect to /', async () => {
+      const agent = request.agent(app);
+      const token = await getCsrfToken(agent, '/signup');
+
+      jest.spyOn(User, 'findOne').mockResolvedValue(null);
+      jest.spyOn(bcrypt, 'hash').mockResolvedValue('hashed_secret_password');
+      const newUser = {
+        id: 1,
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@example.com',
+        password: 'hashed_secret_password',
+      };
+      jest.spyOn(User, 'create').mockResolvedValue(newUser);
+
+      const res = await agent
+        .post('/users')
+        .type('form')
+        .set('Accept', 'text/html')
+        .send({
+          firstName: 'John',
+          lastName: 'Doe',
+          email: 'john@example.com',
+          password: 'Password123!',
+          _csrf: token,
+        })
+        .expect(302);
+
+      expect(res.header.location).toBe('/');
+    });
+
+    it('should reject signup on POST /users if firstName is empty', async () => {
+      const agent = request.agent(app);
+      const token = await getCsrfToken(agent, '/signup');
+
+      const res = await agent
+        .post('/users')
+        .type('form')
+        .set('Accept', 'text/html')
+        .send({
+          firstName: '   ',
+          email: 'test@example.com',
+          password: 'Password123!',
+          _csrf: token,
+        })
+        .expect(302);
+
+      expect(res.header.location).toBe('/signup');
+    });
+
+    it('should reject signup on POST /users if email is empty', async () => {
+      const agent = request.agent(app);
+      const token = await getCsrfToken(agent, '/signup');
+
+      const res = await agent
+        .post('/users')
+        .type('form')
+        .set('Accept', 'text/html')
+        .send({
+          firstName: 'Alice',
+          email: '',
+          password: 'Password123!',
+          _csrf: token,
+        })
+        .expect(302);
+
+      expect(res.header.location).toBe('/signup');
+    });
+
+    it('should reject signup if email is already registered', async () => {
+      const agent = request.agent(app);
+      const token = await getCsrfToken(agent, '/signup');
+
+      jest.spyOn(User, 'findOne').mockResolvedValue({ id: 99, email: 'existing@example.com' });
+
+      const res = await agent
+        .post('/users')
+        .type('form')
+        .set('Accept', 'text/html')
+        .send({
+          firstName: 'Bob',
+          email: 'existing@example.com',
+          password: 'Password123!',
+          _csrf: token,
+        })
+        .expect(302);
+
+      expect(res.header.location).toBe('/signup');
+    });
+
+    it('should render login page with GET /login', async () => {
+      const res = await request(app)
+        .get('/login')
+        .expect('Content-Type', /html/)
+        .expect(200);
+
+      expect(res.text).toContain('Sign in to your account');
+      expect(res.text).toContain('name="_csrf"');
+    });
+
+    it('should authenticate user and redirect to / on valid credentials with POST /session', async () => {
+      const agent = request.agent(app);
+      const token = await getCsrfToken(agent, '/login');
+
+      const mockUser = {
+        id: 1,
+        firstName: 'John',
+        email: 'john@example.com',
+        password: '$2a$10$hashedpasswordstring',
+      };
+
+      jest.spyOn(User, 'findOne').mockResolvedValue(mockUser);
+      jest.spyOn(bcrypt, 'compare').mockResolvedValue(true);
+      jest.spyOn(User, 'findByPk').mockResolvedValue(mockUser);
+
+      const res = await agent
+        .post('/session')
+        .type('form')
+        .set('Accept', 'text/html')
+        .send({
+          email: 'john@example.com',
+          password: 'correctpassword',
+          _csrf: token,
+        })
+        .expect(302);
+
+      expect(res.header.location).toBe('/');
+    });
+
+    it('should reject login and redirect to /login on invalid credentials', async () => {
+      const agent = request.agent(app);
+      const token = await getCsrfToken(agent, '/login');
+
+      jest.spyOn(User, 'findOne').mockResolvedValue(null);
+
+      const res = await agent
+        .post('/session')
+        .type('form')
+        .set('Accept', 'text/html')
+        .send({
+          email: 'wrong@example.com',
+          password: 'wrongpassword',
+          _csrf: token,
+        })
+        .expect(302);
+
+      expect(res.header.location).toBe('/login');
+    });
+
+    it('should sign out user and redirect to /login on GET /signout', async () => {
+      const agent = request.agent(app);
+      const res = await agent
+        .get('/signout')
+        .expect(302);
+
+      expect(res.header.location).toBe('/login');
+    });
+  });
+
   describe('POST /todos - Todo Creation & Validation', () => {
     it('should create a new todo and return status 201 with valid CSRF token', async () => {
       const agent = request.agent(app);
@@ -75,11 +246,13 @@ describe('Express Todo Manager - Milestone Tests', () => {
         })
         .expect(201);
 
-      expect(createSpy).toHaveBeenCalledWith({
-        title: 'Buy groceries',
-        dueDate: '2026-10-10',
-        completed: false,
-      });
+      expect(createSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: 'Buy groceries',
+          dueDate: '2026-10-10',
+          completed: false,
+        })
+      );
       expect(res.body).toEqual(newTodo);
     });
 
@@ -179,7 +352,7 @@ describe('Express Todo Manager - Milestone Tests', () => {
         ),
       };
 
-      jest.spyOn(Todo, 'findByPk').mockResolvedValue(mockTodo);
+      jest.spyOn(Todo, 'findOne').mockResolvedValue(mockTodo);
 
       const res = await agent
         .put('/todos/1')
@@ -210,7 +383,7 @@ describe('Express Todo Manager - Milestone Tests', () => {
         ),
       };
 
-      jest.spyOn(Todo, 'findByPk').mockResolvedValue(mockTodo);
+      jest.spyOn(Todo, 'findOne').mockResolvedValue(mockTodo);
 
       const res = await agent
         .put('/todos/2')
@@ -241,7 +414,7 @@ describe('Express Todo Manager - Milestone Tests', () => {
         ),
       };
 
-      jest.spyOn(Todo, 'findByPk').mockResolvedValue(mockTodo);
+      jest.spyOn(Todo, 'findOne').mockResolvedValue(mockTodo);
 
       const res = await agent
         .put('/todos/3')
@@ -258,7 +431,7 @@ describe('Express Todo Manager - Milestone Tests', () => {
       const agent = request.agent(app);
       const token = await getCsrfToken(agent);
 
-      jest.spyOn(Todo, 'findByPk').mockResolvedValue(null);
+      jest.spyOn(Todo, 'findOne').mockResolvedValue(null);
 
       const res = await agent
         .put('/todos/999')
@@ -271,11 +444,11 @@ describe('Express Todo Manager - Milestone Tests', () => {
       expect(res.body).toHaveProperty('error', 'Todo with id 999 not found');
     });
 
-    it('should return status 500 if Todo.findByPk fails', async () => {
+    it('should return status 500 if Todo query fails', async () => {
       const agent = request.agent(app);
       const token = await getCsrfToken(agent);
 
-      jest.spyOn(Todo, 'findByPk').mockRejectedValue(new Error('Query error'));
+      jest.spyOn(Todo, 'findOne').mockRejectedValue(new Error('Query error'));
 
       const res = await agent
         .put('/todos/1')
@@ -301,9 +474,11 @@ describe('Express Todo Manager - Milestone Tests', () => {
         .send({ _csrf: token })
         .expect(200);
 
-      expect(destroySpy).toHaveBeenCalledWith({
-        where: { id: '1' },
-      });
+      expect(destroySpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({ id: '1' }),
+        })
+      );
       expect(res.body).toEqual({
         success: true,
         message: 'Todo with id 1 deleted successfully',
@@ -336,6 +511,64 @@ describe('Express Todo Manager - Milestone Tests', () => {
         .expect(500);
 
       expect(res.body).toHaveProperty('error', 'Delete error');
+    });
+  });
+
+  describe('User-Specific Todo Ownership', () => {
+    it('should prevent user from accessing or updating another user todo', async () => {
+      const agent = request.agent(app);
+      const loginToken = await getCsrfToken(agent, '/login');
+
+      // Log in as user 1
+      const user1 = { id: 1, firstName: 'UserOne', email: 'user1@example.com', password: 'hashed' };
+      jest.spyOn(User, 'findOne').mockResolvedValue(user1);
+      jest.spyOn(bcrypt, 'compare').mockResolvedValue(true);
+      jest.spyOn(User, 'findByPk').mockResolvedValue(user1);
+
+      await agent
+        .post('/session')
+        .send({ email: 'user1@example.com', password: 'password', _csrf: loginToken });
+
+      // User 1 tries to update a todo belonging to User 2 (Todo.findOne returns null because userId doesn't match)
+      jest.spyOn(Todo, 'findOne').mockImplementation(({ where }) => {
+        if (where.id === '100' && where.userId === 1) {
+          return Promise.resolve(null); // not found for user 1
+        }
+        return Promise.resolve(null);
+      });
+
+      const todoToken = await getCsrfToken(agent);
+      const res = await agent
+        .put('/todos/100')
+        .send({ completed: true, _csrf: todoToken })
+        .expect(404);
+
+      expect(res.body).toHaveProperty('error', 'Todo with id 100 not found');
+    });
+
+    it('should prevent user from deleting another user todo', async () => {
+      const agent = request.agent(app);
+      const loginToken = await getCsrfToken(agent, '/login');
+
+      const user1 = { id: 1, firstName: 'UserOne', email: 'user1@example.com', password: 'hashed' };
+      jest.spyOn(User, 'findOne').mockResolvedValue(user1);
+      jest.spyOn(bcrypt, 'compare').mockResolvedValue(true);
+      jest.spyOn(User, 'findByPk').mockResolvedValue(user1);
+
+      await agent
+        .post('/session')
+        .send({ email: 'user1@example.com', password: 'password', _csrf: loginToken });
+
+      // Todo.destroy returns 0 when where.userId does not match
+      jest.spyOn(Todo, 'destroy').mockResolvedValue(0);
+
+      const todoToken = await getCsrfToken(agent);
+      const res = await agent
+        .delete('/todos/100')
+        .send({ _csrf: todoToken })
+        .expect(404);
+
+      expect(res.body).toHaveProperty('error', 'Todo with id 100 not found');
     });
   });
 

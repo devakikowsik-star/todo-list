@@ -3,59 +3,78 @@ const { Model, Op } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Todo extends Model {
     static associate(models) {
-      // define association here
+      Todo.belongsTo(models.User, {
+        foreignKey: 'userId',
+        as: 'user',
+      });
     }
 
-    static overdue() {
+    static overdue(userId) {
       const today = new Date().toISOString().split('T')[0];
-      return this.findAll({
-        where: {
-          dueDate: {
-            [Op.lt]: today,
-          },
-          completed: false,
+      const whereClause = {
+        dueDate: {
+          [Op.lt]: today,
         },
+        completed: false,
+      };
+      if (userId !== undefined) {
+        whereClause.userId = userId;
+      }
+      return this.findAll({
+        where: whereClause,
         order: [['id', 'ASC']],
       });
     }
 
-    static dueToday() {
+    static dueToday(userId) {
       const today = new Date().toISOString().split('T')[0];
-      return this.findAll({
-        where: {
-          dueDate: {
-            [Op.eq]: today,
-          },
-          completed: false,
+      const whereClause = {
+        dueDate: {
+          [Op.eq]: today,
         },
+        completed: false,
+      };
+      if (userId !== undefined) {
+        whereClause.userId = userId;
+      }
+      return this.findAll({
+        where: whereClause,
         order: [['id', 'ASC']],
       });
     }
 
-    static dueLater() {
+    static dueLater(userId) {
       const today = new Date().toISOString().split('T')[0];
-      return this.findAll({
-        where: {
-          dueDate: {
-            [Op.gt]: today,
-          },
-          completed: false,
+      const whereClause = {
+        dueDate: {
+          [Op.gt]: today,
         },
+        completed: false,
+      };
+      if (userId !== undefined) {
+        whereClause.userId = userId;
+      }
+      return this.findAll({
+        where: whereClause,
         order: [['id', 'ASC']],
       });
     }
 
-    static completedItems() {
+    static completedItems(userId) {
+      const whereClause = {
+        completed: true,
+      };
+      if (userId !== undefined) {
+        whereClause.userId = userId;
+      }
       return this.findAll({
-        where: {
-          completed: true,
-        },
+        where: whereClause,
         order: [['id', 'ASC']],
       });
     }
 
-    static completed() {
-      return this.completedItems();
+    static completed(userId) {
+      return this.completedItems(userId);
     }
 
     setCompletionStatus(completed) {
@@ -84,6 +103,10 @@ module.exports = (sequelize, DataTypes) => {
       completed: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
+      },
+      userId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
       },
     },
     {

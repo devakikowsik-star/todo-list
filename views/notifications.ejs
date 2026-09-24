@@ -1,0 +1,29 @@
+<% if (typeof messages !== 'undefined' && messages.error && messages.error.length > 0) { %>
+  <div class="mb-4 space-y-2">
+    <% for(var i=0; i<messages.error.length; i++) { %>
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2.5 rounded text-sm font-medium shadow-sm">
+        <%= messages.error[i] %>
+      </div>
+    <% } %>
+  </div>
+<% } %>
+
+<% if (typeof messages !== 'undefined' && messages.success && messages.success.length > 0) { %>
+  <div class="mb-4 space-y-2">
+    <% for(var i=0; i<messages.success.length; i++) { %>
+      <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-2.5 rounded text-sm font-medium shadow-sm">
+        <%= messages.success[i] %>
+      </div>
+    <% } %>
+  </div>
+<% } %>
+
+<% if (typeof messages !== 'undefined' && messages.info && messages.info.length > 0) { %>
+  <div class="mb-4 space-y-2">
+    <% for(var i=0; i<messages.info.length; i++) { %>
+      <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-2.5 rounded text-sm font-medium shadow-sm">
+        <%= messages.info[i] %>
+      </div>
+    <% } %>
+  </div>
+<% } %>

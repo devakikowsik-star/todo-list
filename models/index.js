@@ -49,8 +49,18 @@ if (process.env.DATABASE_URL) {
 
 const db = {};
 const Todo = require('./todo')(sequelize, DataTypes);
+const User = require('./user')(sequelize, DataTypes);
+
 db.Todo = Todo;
+db.User = User;
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
+
+if (Todo.associate) {
+  Todo.associate(db);
+}
+if (User.associate) {
+  User.associate(db);
+}
 
 module.exports = db;

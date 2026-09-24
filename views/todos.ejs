@@ -4,38 +4,7 @@
 <ul class="list-none p-0 my-2 space-y-2">
   <% if (todoList && todoList.length > 0) { %>
     <% todoList.forEach(function(todo) { %>
-      <li class="todo-item flex items-center justify-between py-2 px-3 bg-white rounded shadow-sm border border-gray-100 hover:bg-gray-50 transition">
-        <div class="flex items-center space-x-3">
-          <input
-            type="checkbox"
-            id="todo-checkbox-<%= todo.id %>"
-            <%= todo.completed ? 'checked' : '' %>
-            onclick="updateTodo(<%= todo.id %>)"
-            class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 cursor-pointer"
-          />
-          <label
-            for="todo-checkbox-<%= todo.id %>"
-            class="text-sm font-medium cursor-pointer <%= todo.completed ? 'line-through text-gray-400' : 'text-gray-800' %>"
-          >
-            <%= todo.title %>
-          </label>
-        </div>
-        <div class="flex items-center space-x-3">
-          <% if (todo.dueDate) { %>
-            <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-              <%= typeof todo.dueDate === 'string' ? todo.dueDate : (todo.dueDate && todo.dueDate.toISOString ? todo.dueDate.toISOString().split('T')[0] : todo.dueDate) %>
-            </span>
-          <% } %>
-          <a
-            href="#!"
-            onclick="deleteTodo(<%= todo.id %>)"
-            class="text-gray-400 hover:text-red-500 transition cursor-pointer text-sm"
-            title="Delete Todo"
-          >
-            🗑️
-          </a>
-        </div>
-      </li>
+      <%- include('todo.ejs', { todo }) %>
     <% }) %>
   <% } else { %>
     <li class="text-sm text-gray-400 italic py-1 px-3">No tasks in this category.</li>

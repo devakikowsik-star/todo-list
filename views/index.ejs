@@ -10,9 +10,29 @@
 </head>
 <body class="bg-gray-50 min-h-screen text-gray-800">
   <div class="max-w-2xl mx-auto py-10 px-4">
-    <%- include('header.ejs') %>
+    <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
+      <%- include('header.ejs') %>
+      <div class="text-right">
+        <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+          <div class="text-sm text-gray-600 mb-1">
+            Logged in as <span class="font-semibold text-gray-800"><%= currentUser.firstName %></span>
+          </div>
+          <a href="/signout" class="text-xs font-medium text-red-600 hover:text-red-700 underline">
+            Sign out
+          </a>
+        <% } else { %>
+          <div class="space-x-3 text-sm">
+            <a href="/login" class="font-medium text-blue-600 hover:text-blue-700">Sign in</a>
+            <span class="text-gray-300">|</span>
+            <a href="/signup" class="font-medium text-green-600 hover:text-green-700">Sign up</a>
+          </div>
+        <% } %>
+      </div>
+    </div>
 
-    <!-- Create Todo Form with CSRF and Client-side Validation -->
+    <%- include('notifications.ejs') %>
+
+    <!-- Create Todo Form with CSRF and Validation -->
     <section class="bg-white p-5 rounded-lg shadow-sm border border-gray-200 mb-8">
       <form id="todo-form" action="/todos" method="POST" onsubmit="return validateTodoForm(event)" class="space-y-3">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
