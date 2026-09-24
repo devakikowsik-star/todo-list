@@ -3,42 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="<%= csrfToken %>">
   <title>Todo Manager</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body class="bg-gray-50 min-h-screen text-gray-800">
   <div class="max-w-2xl mx-auto py-10 px-4">
-    <header class="mb-8">
-      <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">My Todo-List</h1>
-      <p class="text-sm text-gray-500 mt-1">Manage your daily tasks efficiently</p>
-    </header>
+    <%- include('header.ejs') %>
 
-    <!-- Create Todo Form -->
+    <!-- Create Todo Form with CSRF and Client-side Validation -->
     <section class="bg-white p-5 rounded-lg shadow-sm border border-gray-200 mb-8">
-      <form action="/todos" method="POST" class="flex flex-col sm:flex-row gap-3">
-        <input
-          type="text"
-          name="title"
-          placeholder="What's next?"
-          required
-          class="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-        />
-        <input
-          type="date"
-          name="dueDate"
-          required
-          class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-        />
-        <button
-          type="submit"
-          class="bg-green-600 hover:bg-green-700 text-white font-medium px-5 py-2 rounded transition text-sm shadow-sm"
-        >
-          Add
-        </button>
+      <form id="todo-form" action="/todos" method="POST" onsubmit="return validateTodoForm(event)" class="space-y-3">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <div id="validation-error" class="hidden text-sm text-red-600 bg-red-50 p-2.5 rounded border border-red-200 font-medium"></div>
+        <div class="flex flex-col sm:flex-row gap-3">
+          <input
+            type="text"
+            id="todo-title-input"
+            name="title"
+            placeholder="What's next?"
+            required
+            class="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          />
+          <input
+            type="date"
+            id="todo-date-input"
+            name="dueDate"
+            required
+            class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          />
+          <button
+            type="submit"
+            class="bg-green-600 hover:bg-green-700 text-white font-medium px-5 py-2 rounded transition text-sm shadow-sm"
+          >
+            Add
+          </button>
+        </div>
       </form>
     </section>
 
-    <!-- Todo Categories with Counts and Partials -->
+    <!-- Todo Categories with Counts and Reusable Partials -->
     <main class="space-y-6">
       <!-- Overdue Section -->
       <section class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
@@ -63,19 +68,71 @@
         </h3>
         <%- include('todos.ejs', { todos: dueLaterTodos, data: dueLaterTodos }) %>
       </section>
+
+      <!-- Completed Items Section -->
+      <section class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <h3 class="text-lg font-bold text-gray-800 mb-3 flex items-center justify-between">
+          <span>Completed Items (<span id="count-completed"><%= typeof completedCount !== 'undefined' ? completedCount : (completedTodos ? completedTodos.length : 0) %></span>)</span>
+        </h3>
+        <%- include('todos.ejs', { todos: completedTodos, data: completedTodos }) %>
+      </section>
     </main>
+
+    <%- include('footer.ejs') %>
   </div>
 
   <script>
+    function validateTodoForm(event) {
+      const form = document.getElementById('todo-form');
+      const titleInput = document.getElementById('todo-title-input') || (form && form.elements['title']);
+      const dateInput = document.getElementById('todo-date-input') || (form && form.elements['dueDate']);
+      const errorDiv = document.getElementById('validation-error');
+
+      const title = titleInput ? titleInput.value.trim() : '';
+      const dueDate = dateInput ? dateInput.value.trim() : '';
+
+      if (!title || !dueDate) {
+        if (event) event.preventDefault();
+        if (errorDiv) {
+          errorDiv.textContent = 'Both title and due date are required.';
+          errorDiv.classList.remove('hidden');
+        }
+        return false;
+      }
+
+      if (errorDiv) {
+        errorDiv.classList.add('hidden');
+        errorDiv.textContent = '';
+      }
+      return true;
+    }
+
+    function getCsrfToken() {
+      const meta = document.querySelector('meta[name="csrf-token"]');
+      if (meta && meta.getAttribute('content')) {
+        return meta.getAttribute('content');
+      }
+      const hiddenInput = document.querySelector('input[name="_csrf"]');
+      if (hiddenInput && hiddenInput.value) {
+        return hiddenInput.value;
+      }
+      return '';
+    }
+
     function updateTodo(id) {
       const checkbox = document.getElementById(`todo-checkbox-${id}`);
+      const token = getCsrfToken();
+
       fetch(`/todos/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'csrf-token': token,
+          'x-csrf-token': token,
         },
         body: JSON.stringify({
           completed: checkbox.checked,
+          _csrf: token,
         }),
       })
       .then((res) => {
@@ -93,8 +150,18 @@
 
     function deleteTodo(id) {
       if (confirm('Are you sure you want to delete this todo?')) {
+        const token = getCsrfToken();
+
         fetch(`/todos/${id}`, {
           method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'csrf-token': token,
+            'x-csrf-token': token,
+          },
+          body: JSON.stringify({
+            _csrf: token,
+          }),
         })
         .then((res) => {
           if (res.ok) {

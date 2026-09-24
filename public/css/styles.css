@@ -1,0 +1,8 @@
+/* Custom Styles for Express.js Todo Manager */
+.todo-item {
+  transition: all 0.2s ease-in-out;
+}
+
+.todo-item:hover {
+  transform: translateY(-1px);
+}

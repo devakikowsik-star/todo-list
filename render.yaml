@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: todo-manager
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: todo-manager-db
+          property: connectionString
+      - key: COOKIE_SECRET
+        generateValue: true
+      - key: CSRF_SECRET
+        generateValue: true
+
+databases:
+  - name: todo-manager-db
+    databaseName: todo_manager
+    user: todo_user
+    plan: free

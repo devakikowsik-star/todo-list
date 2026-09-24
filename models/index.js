@@ -8,8 +8,17 @@ const isTest = process.env.NODE_ENV === 'test';
 let sequelize;
 
 if (process.env.DATABASE_URL) {
+  const isProduction = process.env.NODE_ENV === 'production';
   sequelize = new Sequelize(process.env.DATABASE_URL, {
     dialect: 'postgres',
+    dialectOptions: isProduction
+      ? {
+          ssl: {
+            require: true,
+            rejectUnauthorized: false,
+          },
+        }
+      : {},
     logging: isTest ? false : console.log,
     pool: {
       max: 5,

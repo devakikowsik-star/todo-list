@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
           dueDate: {
             [Op.lt]: today,
           },
+          completed: false,
         },
         order: [['id', 'ASC']],
       });
@@ -25,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
           dueDate: {
             [Op.eq]: today,
           },
+          completed: false,
         },
         order: [['id', 'ASC']],
       });
@@ -37,17 +39,27 @@ module.exports = (sequelize, DataTypes) => {
           dueDate: {
             [Op.gt]: today,
           },
+          completed: false,
         },
         order: [['id', 'ASC']],
       });
     }
 
-    setCompletionStatus(completed) {
-      return this.update({ completed });
+    static completedItems() {
+      return this.findAll({
+        where: {
+          completed: true,
+        },
+        order: [['id', 'ASC']],
+      });
     }
 
-    markAsCompleted() {
-      return this.setCompletionStatus(true);
+    static completed() {
+      return this.completedItems();
+    }
+
+    setCompletionStatus(completed) {
+      return this.update({ completed: Boolean(completed) });
     }
   }
 
