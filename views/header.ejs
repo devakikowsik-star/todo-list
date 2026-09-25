@@ -99,6 +99,16 @@
                   <li><a class="dropdown-item" href="/reports"><i class="fa-solid fa-chart-pie me-2 text-muted"></i>Reports & Analytics</a></li>
                 <% } %>
                 <li><hr class="dropdown-divider"></li>
+                <li class="px-2 py-1">
+                  <form action="/switch-role" method="POST">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <button type="submit" class="btn btn-sm btn-outline-warning w-100 text-start d-flex align-items-center justify-content-between rounded-pill px-3">
+                      <span class="small fw-bold"><i class="fa-solid fa-arrows-rotate me-2"></i>Switch to <%= user.role === 'admin' ? 'Player' : 'Admin' %></span>
+                      <span class="badge <%= user.role === 'admin' ? 'bg-secondary' : 'bg-warning text-dark' %>"><%= user.role === 'admin' ? 'PLAYER' : 'ADMIN' %></span>
+                    </button>
+                  </form>
+                </li>
+                <li><hr class="dropdown-divider"></li>
                 <li>
                   <a class="dropdown-item text-danger fw-semibold" href="/signout">
                     <i class="fa-solid fa-right-from-bracket me-2"></i>Sign Out

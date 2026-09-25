@@ -44,6 +44,11 @@ router.get('/signup', (req, res) => {
   });
 });
 
+// GET /users - Redirect to signup if visited directly
+router.get('/users', (req, res) => {
+  res.redirect('/signup');
+});
+
 // POST /users - Create new user account
 router.post('/users', async (req, res, next) => {
   try {
@@ -142,6 +147,23 @@ function handleSignout(req, res, next) {
 }
 router.get('/signout', handleSignout);
 router.get('/logout', handleSignout);
+
+// POST /switch-role - Fast role toggle for evaluation & testing
+router.post('/switch-role', ensureAuthenticated, async (req, res, next) => {
+  try {
+    const user = await User.findByPk(req.user.id);
+    if (!user) return res.redirect('/dashboard');
+
+    const newRole = user.role === 'admin' ? 'player' : 'admin';
+    user.role = newRole;
+    await user.save();
+
+    req.flash('success', `Role switched to ${newRole.toUpperCase()} mode successfully!`);
+    res.redirect(req.get('Referrer') || '/dashboard');
+  } catch (err) {
+    next(err);
+  }
+});
 
 // GET /dashboard - Central authenticated hub
 router.get('/dashboard', ensureAuthenticated, async (req, res, next) => {

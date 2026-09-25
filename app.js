@@ -152,6 +152,10 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   // CSRF token error
   if (err.message && err.message.includes('Did not get a valid CSRF token')) {
+    if (req.headers.accept && req.headers.accept.includes('text/html') && req.headers.referer) {
+      req.flash('error', 'Form submission expired or invalid security token. Please try again.');
+      return res.redirect(req.headers.referer);
+    }
     return res.status(403).json({ error: 'Invalid or missing CSRF token' });
   }
 
