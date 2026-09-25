@@ -8,9 +8,16 @@
     "server": "node index.js",
     "dev": "nodemon index.js",
     "test": "jest --runInBand --detectOpenHandles --forceExit",
-    "predeploy": "npx sequelize-cli db:migrate",
-    "db:migrate": "npx sequelize-cli db:migrate",
-    "db:migrate:undo": "npx sequelize-cli db:migrate:undo"
+    "postinstall": "node scripts/setup-cli.js",
+    "predeploy": "node scripts/setup-cli.js",
+    "db:migrate": "node scripts/setup-cli.js",
+    "db:migrate:undo": "node scripts/setup-cli.js"
+  },
+  "bin": {
+    "sequelize-cli": "./bin/sequelize-cli.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "keywords": [
     "sports-scheduler",
