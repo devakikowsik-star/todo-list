@@ -28,6 +28,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser('sports_scheduler_cookie_secret_wd201'));
 
+// Trust proxy for production reverse proxy environments (e.g. Render)
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 // Session middleware
 app.use(
   session({

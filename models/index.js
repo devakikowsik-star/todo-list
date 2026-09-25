@@ -8,9 +8,12 @@ let sequelize;
 
 if (process.env.DATABASE_URL) {
   const isProduction = process.env.NODE_ENV === 'production';
+  const isLocal = process.env.DATABASE_URL.includes('localhost') || process.env.DATABASE_URL.includes('127.0.0.1');
+  const requireSsl = isProduction || !isLocal;
+
   sequelize = new Sequelize(process.env.DATABASE_URL, {
     dialect: 'postgres',
-    dialectOptions: isProduction
+    dialectOptions: requireSsl
       ? {
           ssl: {
             require: true,
@@ -18,7 +21,7 @@ if (process.env.DATABASE_URL) {
           },
         }
       : {},
-    logging: isTest ? false : console.log,
+    logging: isTest || isProduction ? false : console.log,
     pool: {
       max: 5,
       min: 0,

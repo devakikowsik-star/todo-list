@@ -237,15 +237,29 @@ npm test
 
 ## ☁️ Deployment on Render
 
-This project includes a turnkey [`render.yaml`](file:///C:/Users/DELL/Downloads/sports-scheduler/render.yaml) blueprint for one-click deployment:
+The application is fully configured for zero-configuration hosting on [Render](https://render.com) using managed PostgreSQL.
 
-1. Create a free account at [render.com](https://render.com).
-2. Go to **Blueprints** and select your GitHub repository.
-3. Render automatically provisions:
-   - A free **PostgreSQL Database** (`sports-scheduler-db`).
-   - A free **Node.js Web Service** (`sports-scheduler`).
-4. Migrations are automatically executed via `npx sequelize-cli db:migrate` on pre-deploy.
-5. Live URL: `https://sports-scheduler-app.onrender.com` *(Sample URL)*
+- **Full Deployment Guide**: See [DEPLOYMENT.md](DEPLOYMENT.md) for full instructions.
+- **Live Demo URL**: [https://sports-scheduler-app.onrender.com](https://sports-scheduler-app.onrender.com) *(Configure your live instance URL here)*
+
+### Quick Deployment Steps:
+1. **Create Managed PostgreSQL Database**:
+   - In Render, click **New +** -> **PostgreSQL**.
+   - Set Name: `sports-scheduler-db`, Database: `sports_scheduler`, User: `sports_admin`.
+   - Copy the **Internal Database URL**.
+2. **Create Web Service**:
+   - In Render, click **New +** -> **Web Service** and connect your GitHub repository (`sports-scheduler` branch or `main`).
+   - Runtime: `Node`
+   - Build Command: `npm install`
+   - Pre-Deploy Command: `npx sequelize-cli db:migrate`
+   - Start Command: `node index.js`
+3. **Configure Environment Variables**:
+   - `NODE_ENV`: `production`
+   - `DATABASE_URL`: *(Your Render Internal Database URL)*
+   - `SESSION_SECRET`: *(64-character random string)*
+   - `CSRF_SECRET`: `123456789iamasecret987654321look`
+4. **Deploy Service**:
+   - Render automatically builds the project, runs database migrations, and serves the app over HTTPS.
 
 ---
 
