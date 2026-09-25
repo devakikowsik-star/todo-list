@@ -1,0 +1,80 @@
+<%- include('header') %>
+
+<div class="row justify-content-center py-5">
+  <div class="col-md-7 col-lg-6">
+    <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5 bg-white">
+      <div class="text-center mb-4">
+        <div class="brand-icon bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center p-3 mb-2 shadow-sm">
+          <i class="fa-solid fa-user-plus fs-3"></i>
+        </div>
+        <h3 class="fw-bold text-dark">Create Your Account</h3>
+        <p class="text-muted small">Join your local sports community to host and join sessions</p>
+      </div>
+
+      <form action="/users" method="POST" novalidate>
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+        <div class="row g-3 mb-3">
+          <div class="col-sm-6">
+            <label for="firstName" class="form-label fw-semibold">First Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="firstName" name="firstName" value="<%= formData && formData.firstName ? formData.firstName : '' %>" placeholder="John" required>
+          </div>
+          <div class="col-sm-6">
+            <label for="lastName" class="form-label fw-semibold">Last Name</label>
+            <input type="text" class="form-control" id="lastName" name="lastName" value="<%= formData && formData.lastName ? formData.lastName : '' %>" placeholder="Doe">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="email" class="form-label fw-semibold">Email Address <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="fa-regular fa-envelope text-muted"></i></span>
+            <input type="email" class="form-control border-start-0 ps-0" id="email" name="email" value="<%= formData && formData.email ? formData.email : '' %>" placeholder="name@example.com" required>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="password" class="form-label fw-semibold">Password <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-lock text-muted"></i></span>
+            <input type="password" class="form-control border-start-0 ps-0" id="password" name="password" placeholder="At least 6 characters" required>
+          </div>
+        </div>
+
+        <!-- Role Selection -->
+        <div class="mb-4">
+          <label class="form-label fw-semibold d-block">Account Role <span class="text-danger">*</span></label>
+          <div class="row g-2">
+            <div class="col-6">
+              <input type="radio" class="btn-check" name="role" id="rolePlayer" value="player" <%= !formData || formData.role !== 'admin' ? 'checked' : '' %>>
+              <label class="btn btn-outline-primary w-100 py-2 d-flex flex-column align-items-center rounded-3" for="rolePlayer">
+                <i class="fa-solid fa-running fs-5 mb-1"></i>
+                <span class="fw-bold">Player</span>
+                <span class="text-muted extra-small">Join & create games</span>
+              </label>
+            </div>
+            <div class="col-6">
+              <input type="radio" class="btn-check" name="role" id="roleAdmin" value="admin" <%= formData && formData.role === 'admin' ? 'checked' : '' %>>
+              <label class="btn btn-outline-warning w-100 py-2 d-flex flex-column align-items-center rounded-3" for="roleAdmin">
+                <i class="fa-solid fa-shield-halved fs-5 mb-1"></i>
+                <span class="fw-bold">Admin</span>
+                <span class="text-muted extra-small">Manage sports & reports</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 py-2 rounded-pill fw-bold shadow-sm mb-3">
+          <i class="fa-solid fa-check me-2"></i> Register Account
+        </button>
+
+        <div class="text-center">
+          <span class="text-muted small">Already have an account? </span>
+          <a href="/login" class="text-primary fw-bold text-decoration-none small">Sign In</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('footer') %>

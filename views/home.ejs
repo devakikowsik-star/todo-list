@@ -1,0 +1,132 @@
+<%- include('header') %>
+
+<!-- Hero Section -->
+<div class="row align-items-center py-5 my-3 g-5">
+  <div class="col-lg-6 text-center text-lg-start">
+    <div class="d-inline-flex align-items-center gap-2 px-3 py-1 mb-3 rounded-pill bg-primary bg-opacity-10 text-primary fw-semibold small">
+      <i class="fa-solid fa-fire text-primary"></i> The Premier Sports Community Platform
+    </div>
+    <h1 class="display-4 fw-extrabold text-dark tracking-tight mb-3">
+      Organize Games. <br class="d-none d-sm-inline">
+      Fill Your Roster. <br class="d-none d-sm-inline">
+      <span class="text-primary">Play Anywhere.</span>
+    </h1>
+    <p class="lead text-muted mb-4">
+      Never struggle to find enough players for cricket, football, basketball, or tennis again. Create sessions, discover open games near you, and join with a single click.
+    </p>
+    <div class="d-flex flex-wrap justify-content-center justify-content-lg-start gap-3">
+      <a href="/signup" class="btn btn-primary btn-lg px-4 py-2 rounded-pill fw-bold shadow">
+        <i class="fa-solid fa-user-plus me-2"></i> Get Started Free
+      </a>
+      <a href="/login" class="btn btn-outline-dark btn-lg px-4 py-2 rounded-pill fw-bold">
+        <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Sign In
+      </a>
+    </div>
+
+    <!-- Live Platform Counters -->
+    <div class="row pt-4 mt-4 border-top g-3 text-start">
+      <div class="col-6 col-sm-4">
+        <div class="fw-bold fs-3 text-dark"><%= totalSports %>+</div>
+        <div class="text-muted small">Supported Sports</div>
+      </div>
+      <div class="col-6 col-sm-4">
+        <div class="fw-bold fs-3 text-primary"><%= totalSessions %>+</div>
+        <div class="text-muted small">Sessions Scheduled</div>
+      </div>
+      <div class="col-12 col-sm-4">
+        <div class="fw-bold fs-3 text-success">100%</div>
+        <div class="text-muted small">Real-time Coordination</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="hero-card bg-white p-4 p-md-5 rounded-4 shadow-lg border-0 position-relative overflow-hidden">
+      <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <div>
+          <span class="badge bg-success-subtle text-success px-3 py-1 rounded-pill fw-semibold mb-1">
+            <i class="fa-solid fa-circle text-success me-1 fs-9"></i> Live Session Card
+          </span>
+          <h4 class="fw-bold mb-0">Weekend Football Match</h4>
+        </div>
+        <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-circle">
+          <i class="fa-solid fa-futbol fs-3"></i>
+        </div>
+      </div>
+
+      <div class="vstack gap-3 mb-4">
+        <div class="d-flex align-items-center gap-3">
+          <div class="icon-circle bg-light text-muted"><i class="fa-solid fa-location-dot"></i></div>
+          <div>
+            <div class="small text-muted">Venue</div>
+            <div class="fw-semibold">Downtown Turf Arena, Ground 2</div>
+          </div>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <div class="icon-circle bg-light text-muted"><i class="fa-solid fa-clock"></i></div>
+          <div>
+            <div class="small text-muted">Date & Time</div>
+            <div class="fw-semibold">Saturday, 6:00 PM - 8:00 PM</div>
+          </div>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <div class="icon-circle bg-light text-muted"><i class="fa-solid fa-users"></i></div>
+          <div>
+            <div class="small text-muted">Player Slots</div>
+            <div class="fw-semibold text-primary">3 open slots remaining out of 10</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="progress mb-4" style="height: 10px;">
+        <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
+
+      <a href="/signup" class="btn btn-primary w-100 py-2 rounded-pill fw-bold">
+        Join This Session &rarr;
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Features Section -->
+<div class="py-5" id="features">
+  <div class="text-center mb-5">
+    <h2 class="fw-bold">Why Sports Scheduler?</h2>
+    <p class="text-muted">Built from ground up for competitive and casual athletes alike</p>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="card h-100 border-0 shadow-sm p-4 rounded-4">
+        <div class="feature-icon bg-primary text-white rounded-3 d-inline-flex align-items-center justify-content-center p-3 mb-3" style="width: 50px; height: 50px;">
+          <i class="fa-solid fa-calendar-plus fs-4"></i>
+        </div>
+        <h5 class="fw-bold">Create & Schedule</h5>
+        <p class="text-muted mb-0">Select your favorite sport, enter the venue, pick date & time, declare existing players, and broadcast open slots instantly.</p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card h-100 border-0 shadow-sm p-4 rounded-4">
+        <div class="feature-icon bg-success text-white rounded-3 d-inline-flex align-items-center justify-content-center p-3 mb-3" style="width: 50px; height: 50px;">
+          <i class="fa-solid fa-user-check fs-4"></i>
+        </div>
+        <h5 class="fw-bold">Instant Join & Roster Count</h5>
+        <p class="text-muted mb-0">Browse open sessions, reserve your spot, watch remaining slots decrease dynamically, and leave if your plans change.</p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card h-100 border-0 shadow-sm p-4 rounded-4">
+        <div class="feature-icon bg-warning text-dark rounded-3 d-inline-flex align-items-center justify-content-center p-3 mb-3" style="width: 50px; height: 50px;">
+          <i class="fa-solid fa-chart-pie fs-4"></i>
+        </div>
+        <h5 class="fw-bold">Admin Analytics</h5>
+        <p class="text-muted mb-0">Administrators manage sports catalogues and access reports on popular sports, sessions played, and participation trends.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('footer') %>

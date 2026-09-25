@@ -1,0 +1,19 @@
+<% if (messages && messages.error && messages.error.length > 0) { %>
+  <% messages.error.forEach(function(msg) { %>
+    <div class="alert alert-danger alert-dismissible fade show shadow-sm d-flex align-items-center gap-2 mb-3 border-danger-subtle" role="alert">
+      <i class="fa-solid fa-triangle-exclamation text-danger fs-5"></i>
+      <div class="flex-grow-1 fw-medium"><%= msg %></div>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% }); %>
+<% } %>
+
+<% if (messages && messages.success && messages.success.length > 0) { %>
+  <% messages.success.forEach(function(msg) { %>
+    <div class="alert alert-success alert-dismissible fade show shadow-sm d-flex align-items-center gap-2 mb-3 border-success-subtle" role="alert">
+      <i class="fa-solid fa-circle-check text-success fs-5"></i>
+      <div class="flex-grow-1 fw-medium"><%= msg %></div>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% }); %>
+<% } %>

@@ -1,0 +1,182 @@
+<%- include('header') %>
+
+<div class="row align-items-center mb-4">
+  <div class="col-md-8">
+    <h2 class="fw-bold mb-1">
+      Welcome back, <span class="text-primary"><%= user.firstName %></span>! 👋
+    </h2>
+    <p class="text-muted mb-0">
+      Here is your sports scheduling overview. You are logged in as a
+      <span class="badge <%= user.role === 'admin' ? 'bg-warning text-dark' : 'bg-primary' %> text-uppercase">
+        <%= user.role %>
+      </span>.
+    </p>
+  </div>
+  <div class="col-md-4 text-md-end mt-3 mt-md-0">
+    <a href="/sessions/new" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm">
+      <i class="fa-solid fa-plus me-1"></i> Create Session
+    </a>
+  </div>
+</div>
+
+<!-- KPI Metric Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <span class="text-muted small fw-semibold text-uppercase">Available Games</span>
+        <div class="stat-icon bg-success-subtle text-success p-2 rounded-3">
+          <i class="fa-regular fa-calendar-check fs-5"></i>
+        </div>
+      </div>
+      <div class="fs-2 fw-bold text-dark"><%= availableCount %></div>
+      <a href="/sessions/available" class="small text-success text-decoration-none fw-semibold mt-1">
+        Browse open slots &rarr;
+      </a>
+    </div>
+  </div>
+
+  <div class="col-6 col-lg-3">
+    <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <span class="text-muted small fw-semibold text-uppercase">Joined Sessions</span>
+        <div class="stat-icon bg-primary-subtle text-primary p-2 rounded-3">
+          <i class="fa-solid fa-users fs-5"></i>
+        </div>
+      </div>
+      <div class="fs-2 fw-bold text-dark"><%= joinedCount %></div>
+      <a href="/sessions/joined" class="small text-primary text-decoration-none fw-semibold mt-1">
+        View your schedule &rarr;
+      </a>
+    </div>
+  </div>
+
+  <div class="col-6 col-lg-3">
+    <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <span class="text-muted small fw-semibold text-uppercase">My Created</span>
+        <div class="stat-icon bg-info-subtle text-info p-2 rounded-3">
+          <i class="fa-regular fa-folder-open fs-5"></i>
+        </div>
+      </div>
+      <div class="fs-2 fw-bold text-dark"><%= myCreatedCount %></div>
+      <a href="/sessions/my" class="small text-info text-decoration-none fw-semibold mt-1">
+        Manage hosted games &rarr;
+      </a>
+    </div>
+  </div>
+
+  <div class="col-6 col-lg-3">
+    <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <span class="text-muted small fw-semibold text-uppercase">Active Sports</span>
+        <div class="stat-icon bg-warning-subtle text-warning p-2 rounded-3">
+          <i class="fa-solid fa-medal fs-5"></i>
+        </div>
+      </div>
+      <div class="fs-2 fw-bold text-dark"><%= totalSports %></div>
+      <a href="/sports" class="small text-warning text-decoration-none fw-semibold mt-1">
+        View sports directory &rarr;
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Navigation Action Bar -->
+<div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+  <h5 class="fw-bold mb-3">Quick Actions</h5>
+  <div class="d-flex flex-wrap gap-2">
+    <a href="/sessions/available" class="btn btn-outline-success rounded-pill px-3 py-2 fw-semibold">
+      <i class="fa-regular fa-calendar-check me-2"></i> Join a Match
+    </a>
+    <a href="/sessions/new" class="btn btn-outline-primary rounded-pill px-3 py-2 fw-semibold">
+      <i class="fa-solid fa-plus me-2"></i> Host New Session
+    </a>
+    <a href="/sessions/joined" class="btn btn-outline-secondary rounded-pill px-3 py-2 fw-semibold">
+      <i class="fa-solid fa-users me-2"></i> My Joined Matches
+    </a>
+    <a href="/sports" class="btn btn-outline-info rounded-pill px-3 py-2 fw-semibold">
+      <i class="fa-solid fa-medal me-2"></i> Sports Catalogue
+    </a>
+    <% if (user.role === 'admin') { %>
+      <a href="/reports" class="btn btn-outline-warning text-dark rounded-pill px-3 py-2 fw-semibold">
+        <i class="fa-solid fa-chart-line me-2"></i> View Reports & Analytics
+      </a>
+    <% } %>
+  </div>
+</div>
+
+<!-- Recent Available Sessions -->
+<div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="fw-bold mb-0">Upcoming Games with Open Slots</h5>
+    <a href="/sessions/available" class="btn btn-sm btn-outline-primary rounded-pill fw-semibold">
+      View All Available &rarr;
+    </a>
+  </div>
+
+  <% if (recentAvailable && recentAvailable.length > 0) { %>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">Sport</th>
+            <th scope="col">Venue</th>
+            <th scope="col">Date & Time</th>
+            <th scope="col">Host</th>
+            <th scope="col">Slots Open</th>
+            <th scope="col" class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% recentAvailable.forEach(function(session) { %>
+            <tr>
+              <td>
+                <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-2 rounded-pill">
+                  <i class="fa-solid fa-medal me-1"></i>
+                  <%= session.sport ? session.sport.name : 'Sport' %>
+                </span>
+              </td>
+              <td class="fw-medium">
+                <i class="fa-solid fa-location-dot text-muted me-1"></i> <%= session.venue %>
+              </td>
+              <td>
+                <i class="fa-regular fa-clock text-muted me-1"></i>
+                <%= new Date(session.dateTime).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) %>
+              </td>
+              <td>
+                <span class="text-muted"><%= session.creator ? session.creator.firstName : 'Unknown' %></span>
+              </td>
+              <td>
+                <span class="badge bg-success rounded-pill px-2 py-1">
+                  <%= session.getRemainingSlots() %> left
+                </span>
+              </td>
+              <td class="text-end">
+                <div class="d-inline-flex gap-2">
+                  <a href="/sessions/<%= session.id %>" class="btn btn-sm btn-outline-secondary rounded-pill">
+                    Details
+                  </a>
+                  <form action="/sessions/<%= session.id %>/join" method="POST" class="d-inline">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <button type="submit" class="btn btn-sm btn-success rounded-pill fw-semibold">
+                      Join
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  <% } else { %>
+    <div class="text-center py-4 text-muted">
+      <i class="fa-regular fa-calendar-xmark fs-1 text-muted opacity-50 mb-2"></i>
+      <p class="mb-2">No other upcoming sessions currently have open slots.</p>
+      <a href="/sessions/new" class="btn btn-sm btn-primary rounded-pill">Be the first to create one!</a>
+    </div>
+  <% } %>
+</div>
+
+<%- include('footer') %>

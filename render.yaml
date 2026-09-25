@@ -1,0 +1,25 @@
+databases:
+  - name: sports-scheduler-db
+    databaseName: sports_scheduler
+    user: sports_admin
+    plan: free
+
+services:
+  - type: web
+    name: sports-scheduler
+    env: node
+    plan: free
+    buildCommand: npm install
+    preDeployCommand: npx sequelize-cli db:migrate
+    startCommand: node index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sports-scheduler-db
+          property: connectionString
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: CSRF_SECRET
+        generateValue: true

@@ -1,0 +1,152 @@
+<%- include('../header') %>
+
+<div class="row align-items-center mb-4">
+  <div class="col-md-8">
+    <h2 class="fw-bold mb-1">
+      <i class="fa-solid fa-users text-primary me-2"></i>My Joined Sessions
+    </h2>
+    <p class="text-muted mb-0">Track matches you have RSVP'd to participate in.</p>
+  </div>
+  <div class="col-md-4 text-md-end mt-3 mt-md-0">
+    <a href="/sessions/available" class="btn btn-outline-primary rounded-pill px-3 py-2 fw-semibold">
+      <i class="fa-regular fa-calendar-check me-1"></i> Browse More Sessions
+    </a>
+  </div>
+</div>
+
+<!-- Tabs for Upcoming vs Past -->
+<ul class="nav nav-pills mb-4 gap-2" id="joinedTabs" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active rounded-pill px-4 fw-semibold" id="upcoming-tab" data-bs-toggle="pill" data-bs-target="#upcoming" type="button" role="tab" aria-controls="upcoming" aria-selected="true">
+      Upcoming Matches (<%= upcomingSessions ? upcomingSessions.length : 0 %>)
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link rounded-pill px-4 fw-semibold" id="past-tab" data-bs-toggle="pill" data-bs-target="#past" type="button" role="tab" aria-controls="past" aria-selected="false">
+      Past / Completed (<%= pastSessions ? pastSessions.length : 0 %>)
+    </button>
+  </li>
+</ul>
+
+<div class="tab-content" id="joinedTabsContent">
+  <!-- Upcoming Tab -->
+  <div class="tab-pane fade show active" id="upcoming" role="tabpanel" aria-labelledby="upcoming-tab">
+    <% if (upcomingSessions && upcomingSessions.length > 0) { %>
+      <div class="row g-4">
+        <% upcomingSessions.forEach(function(session) { %>
+          <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100 d-flex flex-column border-start border-4 border-primary">
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-2 rounded-pill fs-7">
+                  <i class="fa-solid fa-medal me-1"></i> <%= session.sport ? session.sport.name : 'Sport' %>
+                </span>
+                <span class="badge bg-info-subtle text-info rounded-pill px-3 py-1 fw-semibold">
+                  Confirmed
+                </span>
+              </div>
+
+              <h5 class="fw-bold text-dark mb-2">
+                <%= session.sport ? session.sport.name : 'Match' %> Session
+              </h5>
+
+              <div class="vstack gap-2 mb-3 text-muted small">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="fa-solid fa-location-dot text-danger flex-shrink-0" style="width: 16px;"></i>
+                  <span class="text-truncate fw-medium text-dark"><%= session.venue %></span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <i class="fa-regular fa-calendar text-primary flex-shrink-0" style="width: 16px;"></i>
+                  <span><%= new Date(session.dateTime).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) %></span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <i class="fa-regular fa-clock text-info flex-shrink-0" style="width: 16px;"></i>
+                  <span><%= new Date(session.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %></span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <i class="fa-regular fa-user text-secondary flex-shrink-0" style="width: 16px;"></i>
+                  <span>Host: <strong class="text-dark"><%= session.creator ? session.creator.firstName : 'Player' %></strong></span>
+                </div>
+              </div>
+
+              <div class="mt-auto pt-3 border-top d-flex gap-2">
+                <a href="/sessions/<%= session.id %>" class="btn btn-outline-secondary rounded-pill px-3 flex-grow-1">
+                  View Details
+                </a>
+                <form action="/sessions/<%= session.id %>/leave" method="POST" onsubmit="return confirm('Are you sure you want to leave this session?');" class="flex-grow-1">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <button type="submit" class="btn btn-outline-danger rounded-pill px-3 fw-semibold w-100">
+                    <i class="fa-solid fa-arrow-right-from-bracket me-1"></i> Leave
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white my-2">
+        <i class="fa-regular fa-calendar-plus fs-1 text-muted opacity-50 mb-3"></i>
+        <h5 class="fw-bold mb-2">You haven't joined any upcoming sessions</h5>
+        <p class="text-muted mb-3">Check out available games and RSVP to secure your spot on the field!</p>
+        <div>
+          <a href="/sessions/available" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold">
+            Browse Available Games
+          </a>
+        </div>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Past Tab -->
+  <div class="tab-pane fade" id="past" role="tabpanel" aria-labelledby="past-tab">
+    <% if (pastSessions && pastSessions.length > 0) { %>
+      <div class="row g-4">
+        <% pastSessions.forEach(function(session) { %>
+          <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100 opacity-85">
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <span class="badge bg-secondary-subtle text-secondary fw-bold px-3 py-2 rounded-pill fs-7">
+                  <%= session.sport ? session.sport.name : 'Sport' %>
+                </span>
+                <% if (session.isCancelled) { %>
+                  <span class="badge bg-danger text-white rounded-pill px-3 py-1 fw-semibold">
+                    Cancelled
+                  </span>
+                <% } else { %>
+                  <span class="badge bg-secondary text-white rounded-pill px-3 py-1 fw-semibold">
+                    Completed
+                  </span>
+                <% } %>
+              </div>
+
+              <h5 class="fw-bold text-dark mb-2"><%= session.venue %></h5>
+
+              <div class="vstack gap-1 text-muted small mb-3">
+                <div><i class="fa-regular fa-calendar me-1"></i> <%= new Date(session.dateTime).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) %></div>
+                <div><i class="fa-regular fa-clock me-1"></i> <%= new Date(session.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %></div>
+              </div>
+
+              <% if (session.isCancelled) { %>
+                <div class="alert alert-danger p-2 small mb-3 rounded-3">
+                  <strong>Cancellation Reason:</strong> <%= session.cancellationReason || 'No reason provided' %>
+                </div>
+              <% } %>
+
+              <div class="mt-auto pt-3 border-top">
+                <a href="/sessions/<%= session.id %>" class="btn btn-sm btn-outline-secondary rounded-pill w-100">
+                  View Recap
+                </a>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white my-2">
+        <p class="text-muted mb-0">No past sessions on your record.</p>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../footer') %>

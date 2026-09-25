@@ -1,0 +1,46 @@
+<%- include('header') %>
+
+<div class="row justify-content-center py-5">
+  <div class="col-md-6 col-lg-5">
+    <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5 bg-white">
+      <div class="text-center mb-4">
+        <div class="brand-icon bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center p-3 mb-2 shadow-sm">
+          <i class="fa-solid fa-lock fs-3"></i>
+        </div>
+        <h3 class="fw-bold text-dark">Welcome Back</h3>
+        <p class="text-muted small">Sign in to coordinate sports sessions and track games</p>
+      </div>
+
+      <form action="/session" method="POST" novalidate>
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+        <div class="mb-3">
+          <label for="email" class="form-label fw-semibold">Email Address</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="fa-regular fa-envelope text-muted"></i></span>
+            <input type="email" class="form-control border-start-0 ps-0" id="email" name="email" placeholder="name@example.com" required autofocus>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label for="password" class="form-label fw-semibold">Password</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-key text-muted"></i></span>
+            <input type="password" class="form-control border-start-0 ps-0" id="password" name="password" placeholder="••••••••" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 py-2 rounded-pill fw-bold shadow-sm mb-3">
+          <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Sign In
+        </button>
+
+        <div class="text-center">
+          <span class="text-muted small">Don't have an account? </span>
+          <a href="/signup" class="text-primary fw-bold text-decoration-none small">Create an account</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('footer') %>

@@ -1,0 +1,100 @@
+<%- include('../header') %>
+
+<div class="row align-items-center mb-4">
+  <div class="col-md-8">
+    <h2 class="fw-bold mb-1">
+      <i class="fa-regular fa-folder-open text-primary me-2"></i>My Created Sessions
+    </h2>
+    <p class="text-muted mb-0">Manage matches and games hosted by you.</p>
+  </div>
+  <div class="col-md-4 text-md-end mt-3 mt-md-0">
+    <a href="/sessions/new" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm">
+      <i class="fa-solid fa-plus me-1"></i> Host New Session
+    </a>
+  </div>
+</div>
+
+<% if (sessions && sessions.length > 0) { %>
+  <div class="row g-4">
+    <% sessions.forEach(function(session) { %>
+      <% 
+        const isPast = new Date(session.dateTime) < new Date();
+        const isCancelled = session.isCancelled;
+        const joinedCount = session.participants ? session.participants.length : 0;
+        const remainingSlots = Math.max(0, session.additionalPlayersNeeded - joinedCount);
+      %>
+      <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100 d-flex flex-column <%= isCancelled ? 'border-start border-4 border-danger' : (isPast ? 'opacity-85' : 'border-start border-4 border-success') %>">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-2 rounded-pill fs-7">
+              <i class="fa-solid fa-medal me-1"></i> <%= session.sport ? session.sport.name : 'Sport' %>
+            </span>
+            <% if (isCancelled) { %>
+              <span class="badge bg-danger rounded-pill px-3 py-1 fw-semibold">
+                <i class="fa-solid fa-ban me-1"></i> Cancelled
+              </span>
+            <% } else if (isPast) { %>
+              <span class="badge bg-secondary rounded-pill px-3 py-1 fw-semibold">
+                Completed
+              </span>
+            <% } else { %>
+              <span class="badge bg-success rounded-pill px-3 py-1 fw-semibold">
+                Active &bull; <%= remainingSlots %> open slots
+              </span>
+            <% } %>
+          </div>
+
+          <h5 class="fw-bold text-dark mb-2"><%= session.venue %></h5>
+
+          <div class="vstack gap-2 mb-3 text-muted small">
+            <div>
+              <i class="fa-regular fa-calendar text-primary me-1"></i>
+              <%= new Date(session.dateTime).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) %>
+            </div>
+            <div>
+              <i class="fa-regular fa-clock text-info me-1"></i>
+              <%= new Date(session.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %>
+            </div>
+            <div>
+              <i class="fa-solid fa-users text-secondary me-1"></i>
+              <span>Platform Roster: <strong><%= joinedCount %></strong> joined / <%= session.additionalPlayersNeeded %> requested</span>
+            </div>
+          </div>
+
+          <% if (isCancelled && session.cancellationReason) { %>
+            <div class="alert alert-danger p-2 small mb-3 rounded-3">
+              <i class="fa-solid fa-circle-exclamation me-1"></i>
+              <strong>Reason:</strong> <%= session.cancellationReason %>
+            </div>
+          <% } %>
+
+          <div class="mt-auto pt-3 border-top d-flex gap-2">
+            <a href="/sessions/<%= session.id %>" class="btn btn-outline-secondary rounded-pill px-3 flex-grow-1">
+              View Details
+            </a>
+            <% if (!isCancelled && !isPast) { %>
+              <a href="/sessions/<%= session.id %>/cancel" class="btn btn-outline-danger rounded-pill px-3 fw-semibold">
+                <i class="fa-solid fa-ban me-1"></i> Cancel
+              </a>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    <% }); %>
+  </div>
+<% } else { %>
+  <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white my-3">
+    <i class="fa-solid fa-plus-circle fs-1 text-primary opacity-50 mb-3"></i>
+    <h4 class="fw-bold mb-2">You haven't hosted any sessions yet</h4>
+    <p class="text-muted max-w-md mx-auto mb-4">
+      Schedule your first sports match to start gathering players and friends.
+    </p>
+    <div>
+      <a href="/sessions/new" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm">
+        <i class="fa-solid fa-plus me-1"></i> Host a Session Now
+      </a>
+    </div>
+  </div>
+<% } %>
+
+<%- include('../footer') %>

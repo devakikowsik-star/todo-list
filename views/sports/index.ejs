@@ -1,0 +1,114 @@
+<%- include('../header') %>
+
+<div class="row align-items-center mb-4">
+  <div class="col-md-8">
+    <h2 class="fw-bold mb-1">
+      <i class="fa-solid fa-medal text-primary me-2"></i>Sports Directory
+    </h2>
+    <p class="text-muted mb-0">Browse supported sports or manage sports categories (Admin).</p>
+  </div>
+</div>
+
+<div class="row g-4">
+  <% if (user.role === 'admin') { %>
+    <!-- Admin: Add Sport Card -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white sticky-top" style="top: 90px;">
+        <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+          <i class="fa-solid fa-plus-circle text-primary"></i> Add New Sport
+        </h5>
+        <p class="text-muted small mb-3">Add a new sport to the catalog so players can schedule sessions.</p>
+
+        <form action="/sports" method="POST">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+          <div class="mb-3">
+            <label for="name" class="form-label fw-semibold">Sport Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="name" name="name" placeholder="e.g. Cricket, Badminton, Football" required>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100 py-2 rounded-pill fw-bold shadow-sm">
+            <i class="fa-solid fa-plus me-1"></i> Add Sport
+          </button>
+        </form>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- Sports Catalog List -->
+  <div class="<%= user.role === 'admin' ? 'col-lg-8' : 'col-12' %>">
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0">Available Sports (<%= sports.length %>)</h5>
+      </div>
+
+      <% if (sports && sports.length > 0) { %>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col">Sport Name</th>
+                <th scope="col">Total Sessions</th>
+                <th scope="col">Added By</th>
+                <% if (user.role === 'admin') { %>
+                  <th scope="col" class="text-end">Actions</th>
+                <% } %>
+              </tr>
+            </thead>
+            <tbody>
+              <% sports.forEach(function(sport) { %>
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="icon-circle bg-primary-subtle text-primary p-2 rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                        <i class="fa-solid fa-volleyball fs-6"></i>
+                      </span>
+                      <span class="fw-bold text-dark"><%= sport.name %></span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge bg-light text-dark border rounded-pill px-3 py-1">
+                      <%= sport.sessions ? sport.sessions.length : 0 %> sessions
+                    </span>
+                  </td>
+                  <td>
+                    <span class="text-muted small">
+                      <%= sport.creator ? sport.creator.firstName : 'Admin' %>
+                    </span>
+                  </td>
+                  <% if (user.role === 'admin') { %>
+                    <td class="text-end">
+                      <div class="d-inline-flex gap-2">
+                        <a href="/sports/<%= sport.id %>/edit" class="btn btn-sm btn-outline-secondary rounded-pill">
+                          <i class="fa-regular fa-pen-to-square"></i> Edit
+                        </a>
+                        <form action="/sports/<%= sport.id %>/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this sport and all its sessions?');" class="d-inline">
+                          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                          <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill">
+                            <i class="fa-regular fa-trash-can"></i> Delete
+                          </button>
+                        </form>
+                      </div>
+                    </td>
+                  <% } %>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } else { %>
+        <div class="text-center py-5 text-muted">
+          <i class="fa-solid fa-medal fs-1 text-muted opacity-50 mb-3"></i>
+          <p class="mb-2">No sports have been added yet.</p>
+          <% if (user.role === 'admin') { %>
+            <p class="small text-muted">Use the form on the left to add your first sport!</p>
+          <% } else { %>
+            <p class="small text-muted">Please check back soon after an administrator configures sports.</p>
+          <% } %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('../footer') %>

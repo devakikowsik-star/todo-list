@@ -1,0 +1,214 @@
+<%- include('../header') %>
+
+<div class="row align-items-center mb-4">
+  <div class="col-md-8">
+    <div class="d-inline-flex align-items-center gap-2 px-3 py-1 mb-2 rounded-pill bg-warning-subtle text-warning-emphasis fw-bold small">
+      <i class="fa-solid fa-shield-halved"></i> Administrator Dashboard
+    </div>
+    <h2 class="fw-bold mb-1">
+      <i class="fa-solid fa-chart-line text-warning me-2"></i>Sports Analytics & Reports
+    </h2>
+    <p class="text-muted mb-0">Overview of completed sessions, participation rates, and popular sports.</p>
+  </div>
+</div>
+
+<!-- Date Range Filter Form -->
+<div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+  <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+    <i class="fa-solid fa-filter text-primary"></i> Filter Sessions by Date Range
+  </h5>
+  <form action="/reports" method="GET" class="row g-3 align-items-end">
+    <div class="col-sm-4">
+      <label for="startDate" class="form-label fw-semibold small text-muted">From Date</label>
+      <input type="date" class="form-control rounded-3" id="startDate" name="startDate" value="<%= filters.startDate %>">
+    </div>
+    <div class="col-sm-4">
+      <label for="endDate" class="form-label fw-semibold small text-muted">To Date</label>
+      <input type="date" class="form-control rounded-3" id="endDate" name="endDate" value="<%= filters.endDate %>">
+    </div>
+    <div class="col-sm-4 d-flex gap-2">
+      <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold flex-grow-1 shadow-sm">
+        <i class="fa-solid fa-magnifying-glass me-1"></i> Apply Filter
+      </button>
+      <% if (filters.startDate || filters.endDate) { %>
+        <a href="/reports" class="btn btn-outline-secondary rounded-pill px-3">
+          Reset
+        </a>
+      <% } %>
+    </div>
+  </form>
+</div>
+
+<!-- Top-level Analytics KPI Metric Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100 border-start border-4 border-success">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="text-muted small fw-bold text-uppercase">Sessions Played</span>
+        <div class="p-2 bg-success-subtle text-success rounded-3">
+          <i class="fa-solid fa-check-double fs-5"></i>
+        </div>
+      </div>
+      <div class="display-6 fw-bold text-dark"><%= totalSessionsPlayed %></div>
+      <div class="text-muted small mt-1">
+        <%= (filters.startDate || filters.endDate) ? 'Matches held within selected dates' : 'Total past completed matches held' %>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100 border-start border-4 border-primary">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="text-muted small fw-bold text-uppercase">Upcoming Sessions</span>
+        <div class="p-2 bg-primary-subtle text-primary rounded-3">
+          <i class="fa-regular fa-calendar-check fs-5"></i>
+        </div>
+      </div>
+      <div class="display-6 fw-bold text-dark"><%= totalUpcomingSessions %></div>
+      <div class="text-muted small mt-1">Scheduled future games ready to be played</div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100 border-start border-4 border-danger">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="text-muted small fw-bold text-uppercase">Cancelled Sessions</span>
+        <div class="p-2 bg-danger-subtle text-danger rounded-3">
+          <i class="fa-solid fa-ban fs-5"></i>
+        </div>
+      </div>
+      <div class="display-6 fw-bold text-dark"><%= totalCancelledSessions %></div>
+      <div class="text-muted small mt-1">Sessions terminated by organizers</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Popular Sports Report Ranking -->
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0 d-flex align-items-center gap-2">
+          <i class="fa-solid fa-ranking-star text-warning"></i> Popular Sports Report
+        </h5>
+        <span class="badge bg-light text-muted border">Ranked by Activity</span>
+      </div>
+      <p class="text-muted small mb-3">Based on total sessions organized and players who have participated.</p>
+
+      <% if (sportsReport && sportsReport.length > 0) { %>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col">Rank</th>
+                <th scope="col">Sport Name</th>
+                <th scope="col" class="text-center">Sessions</th>
+                <th scope="col" class="text-center">Participants</th>
+                <th scope="col" class="text-end">Popularity</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% sportsReport.forEach(function(item, idx) { %>
+                <tr>
+                  <td>
+                    <% if (idx === 0) { %>
+                      <span class="badge bg-warning text-dark rounded-circle p-2">🥇</span>
+                    <% } else if (idx === 1) { %>
+                      <span class="badge bg-secondary-subtle text-secondary rounded-circle p-2">🥈</span>
+                    <% } else if (idx === 2) { %>
+                      <span class="badge bg-danger-subtle text-danger rounded-circle p-2">🥉</span>
+                    <% } else { %>
+                      <span class="text-muted fw-bold ps-2">#<%= idx + 1 %></span>
+                    <% } %>
+                  </td>
+                  <td class="fw-bold text-dark">
+                    <%= item.name %>
+                  </td>
+                  <td class="text-center">
+                    <span class="badge bg-light text-dark border rounded-pill px-2 py-1">
+                      <%= item.sessionsCount %>
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1">
+                      <%= item.totalParticipants %> players
+                    </span>
+                  </td>
+                  <td class="text-end">
+                    <div class="d-inline-flex align-items-center gap-1">
+                      <div class="progress" style="width: 60px; height: 6px;">
+                        <div class="progress-bar bg-warning" role="progressbar" style="width: <%= Math.min(100, item.popularityScore * 10) %>%;"></div>
+                      </div>
+                      <span class="extra-small text-muted"><%= item.popularityScore %> pts</span>
+                    </div>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } else { %>
+        <div class="text-center py-4 text-muted">
+          No sports activity recorded yet.
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Sessions Played Breakdown -->
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0 d-flex align-items-center gap-2">
+          <i class="fa-solid fa-list-check text-success"></i> Completed Sessions Log
+        </h5>
+        <span class="badge bg-success-subtle text-success fw-bold"><%= playedSessions.length %> Matches</span>
+      </div>
+      <p class="text-muted small mb-3">Detailed record of matches played within the applied parameters.</p>
+
+      <% if (playedSessions && playedSessions.length > 0) { %>
+        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light sticky-top">
+              <tr>
+                <th scope="col">Sport</th>
+                <th scope="col">Venue</th>
+                <th scope="col">Date Played</th>
+                <th scope="col" class="text-end">Turnout</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% playedSessions.forEach(function(s) { %>
+                <tr>
+                  <td>
+                    <span class="badge bg-primary-subtle text-primary fw-semibold px-2 py-1 rounded-pill">
+                      <%= s.sport ? s.sport.name : 'Sport' %>
+                    </span>
+                  </td>
+                  <td class="text-truncate fw-medium" style="max-width: 140px;">
+                    <%= s.venue %>
+                  </td>
+                  <td class="small text-muted">
+                    <%= new Date(s.dateTime).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) %>
+                  </td>
+                  <td class="text-end">
+                    <span class="badge bg-success text-white rounded-pill px-2 py-1">
+                      <%= s.participants ? s.participants.length : 0 %> joined
+                    </span>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } else { %>
+        <div class="text-center py-5 text-muted">
+          <i class="fa-solid fa-clock-rotate-left fs-2 text-muted opacity-50 mb-2"></i>
+          <p class="mb-0">No completed sessions found for the specified period.</p>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('../footer') %>

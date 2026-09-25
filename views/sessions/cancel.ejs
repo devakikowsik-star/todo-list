@@ -1,0 +1,55 @@
+<%- include('../header') %>
+
+<div class="row justify-content-center py-4">
+  <div class="col-md-7 col-lg-6">
+    <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5 bg-white border-top border-5 border-danger">
+      <div class="text-center mb-4">
+        <div class="brand-icon bg-danger-subtle text-danger rounded-circle d-inline-flex align-items-center justify-content-center p-3 mb-2">
+          <i class="fa-solid fa-triangle-exclamation fs-2"></i>
+        </div>
+        <h3 class="fw-bold text-dark">Cancel Sports Session</h3>
+        <p class="text-muted small">
+          Are you sure you want to cancel the 
+          <strong><%= session.sport ? session.sport.name : 'sports' %></strong> match scheduled for 
+          <strong><%= new Date(session.dateTime).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }) %></strong> at 
+          <strong><%= session.venue %></strong>?
+        </p>
+      </div>
+
+      <div class="alert alert-warning rounded-3 small mb-4">
+        <i class="fa-solid fa-circle-info me-1"></i>
+        <strong>Important:</strong> A cancellation reason is <strong>mandatory</strong> and will be displayed to all participants who have joined this session.
+      </div>
+
+      <form action="/sessions/<%= session.id %>/cancel" method="POST">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+        <div class="mb-4">
+          <label for="cancellationReason" class="form-label fw-semibold">
+            Reason for Cancellation <span class="text-danger">*</span>
+          </label>
+          <textarea 
+            class="form-control" 
+            id="cancellationReason" 
+            name="cancellationReason" 
+            rows="4" 
+            placeholder="e.g. Inclement heavy rain forecast, venue turf under maintenance, organizer injury, emergency rescheduling..."
+            required 
+            autofocus></textarea>
+          <div class="form-text">Please provide a clear and respectful explanation for your teammates.</div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-danger rounded-pill px-4 py-2 fw-bold shadow-sm flex-grow-1">
+            <i class="fa-solid fa-ban me-1"></i> Confirm & Cancel Session
+          </button>
+          <a href="/sessions/<%= session.id %>" class="btn btn-outline-secondary rounded-pill px-4 py-2">
+            Nevermind, Go Back
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('../footer') %>

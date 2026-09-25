@@ -1,0 +1,95 @@
+<%- include('../header') %>
+
+<div class="row justify-content-center py-4">
+  <div class="col-md-8 col-lg-7">
+    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+      <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
+        <div>
+          <span class="badge bg-primary-subtle text-primary px-3 py-1 rounded-pill fw-semibold mb-1">
+            New Session
+          </span>
+          <h3 class="fw-bold mb-0">Host a Sports Game</h3>
+        </div>
+        <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-circle">
+          <i class="fa-solid fa-calendar-plus fs-3"></i>
+        </div>
+      </div>
+
+      <form action="/sessions" method="POST" id="createSessionForm">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+        <!-- Sport Selection -->
+        <div class="mb-3">
+          <label for="sportId" class="form-label fw-semibold">Select Sport <span class="text-danger">*</span></label>
+          <select class="form-select" id="sportId" name="sportId" required>
+            <option value="" disabled <%= !formData || !formData.sportId ? 'selected' : '' %>>-- Choose a Sport --</option>
+            <% sports.forEach(function(sport) { %>
+              <option value="<%= sport.id %>" <%= formData && formData.sportId == sport.id ? 'selected' : '' %>>
+                <%= sport.name %>
+              </option>
+            <% }); %>
+          </select>
+        </div>
+
+        <!-- Venue Input -->
+        <div class="mb-3">
+          <label for="venue" class="form-label fw-semibold">Venue / Location <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-location-dot text-muted"></i></span>
+            <input type="text" class="form-control border-start-0 ps-0" id="venue" name="venue" value="<%= formData && formData.venue ? formData.venue : '' %>" placeholder="e.g. City Sports Complex, Court 3" required>
+          </div>
+        </div>
+
+        <!-- Date & Time Input -->
+        <div class="mb-3">
+          <label for="dateTime" class="form-label fw-semibold">Date & Time <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="fa-regular fa-clock text-muted"></i></span>
+            <input type="datetime-local" class="form-control border-start-0 ps-0" id="dateTime" name="dateTime" value="<%= formData && formData.dateTime ? formData.dateTime : '' %>" required>
+          </div>
+          <div class="form-text">Must be scheduled in the future.</div>
+        </div>
+
+        <!-- Additional Player Slots Required -->
+        <div class="mb-3">
+          <label for="additionalPlayersNeeded" class="form-label fw-semibold">Additional Player Slots Needed <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-user-plus text-muted"></i></span>
+            <input type="number" class="form-control border-start-0 ps-0" id="additionalPlayersNeeded" name="additionalPlayersNeeded" min="0" value="<%= formData && formData.additionalPlayersNeeded !== undefined ? formData.additionalPlayersNeeded : 4 %>" required>
+          </div>
+          <div class="form-text">Number of open spots you need platform players to fill.</div>
+        </div>
+
+        <!-- Existing Players Already Participating -->
+        <div class="mb-4">
+          <label for="existingPlayers" class="form-label fw-semibold">Existing Players Already Participating (Optional)</label>
+          <textarea class="form-control" id="existingPlayers" name="existingPlayers" rows="2" placeholder="e.g. Alex, Sam, Rahul (friends who have already agreed to play)"><%= formData && formData.existingPlayers ? formData.existingPlayers : '' %></textarea>
+          <div class="form-text">List friends or teammates outside the platform who are already coming.</div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm flex-grow-1">
+            <i class="fa-solid fa-paper-plane me-2"></i> Publish Session
+          </button>
+          <a href="/dashboard" class="btn btn-outline-secondary rounded-pill px-4 py-2">
+            Cancel
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Set min datetime-local to current local time
+  (function() {
+    const dtInput = document.getElementById('dateTime');
+    if (dtInput) {
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      dtInput.min = now.toISOString().slice(0, 16);
+    }
+  })();
+</script>
+
+<%- include('../footer') %>

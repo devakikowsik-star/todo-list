@@ -1,0 +1,26 @@
+<%- include('../header') %>
+
+<div class="row justify-content-center py-5">
+  <div class="col-md-6 text-center">
+    <div class="display-1 fw-extrabold text-danger mb-2">500</div>
+    <div class="p-3 bg-danger-subtle text-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+      <i class="fa-solid fa-server fs-1"></i>
+    </div>
+    <h3 class="fw-bold text-dark mb-2">Unexpected Server Error</h3>
+    <p class="text-muted mb-4">
+      An unexpected error occurred while processing your request. Please try again or return to the home screen.
+    </p>
+    <% if (error) { %>
+      <div class="alert alert-light text-start border small text-muted font-monospace p-3 mb-4">
+        <%= error.message || error %>
+      </div>
+    <% } %>
+    <div>
+      <a href="/" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm">
+        <i class="fa-solid fa-house me-1"></i> Back to Safety
+      </a>
+    </div>
+  </div>
+</div>
+
+<%- include('../footer') %>

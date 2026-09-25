@@ -1,0 +1,24 @@
+<%- include('../header') %>
+
+<div class="row justify-content-center py-5">
+  <div class="col-md-6 text-center">
+    <div class="display-1 fw-extrabold text-warning mb-2">403</div>
+    <div class="p-3 bg-warning-subtle text-warning-emphasis rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+      <i class="fa-solid fa-lock fs-1"></i>
+    </div>
+    <h3 class="fw-bold text-dark mb-2">Access Denied</h3>
+    <p class="text-muted mb-4">
+      You do not have administrative permission to view or modify this resource.
+    </p>
+    <div class="d-flex justify-content-center gap-2">
+      <a href="/dashboard" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm">
+        <i class="fa-solid fa-house me-1"></i> Return to Dashboard
+      </a>
+      <a href="/sessions/available" class="btn btn-outline-secondary rounded-pill px-4">
+        Browse Games
+      </a>
+    </div>
+  </div>
+</div>
+
+<%- include('../footer') %>

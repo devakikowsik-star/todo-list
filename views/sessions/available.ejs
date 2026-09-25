@@ -1,0 +1,96 @@
+<%- include('../header') %>
+
+<div class="row align-items-center mb-4">
+  <div class="col-md-8">
+    <h2 class="fw-bold mb-1">
+      <i class="fa-regular fa-calendar-check text-primary me-2"></i>Available Sessions
+    </h2>
+    <p class="text-muted mb-0">Browse open upcoming games looking for players and join with one click.</p>
+  </div>
+  <div class="col-md-4 text-md-end mt-3 mt-md-0">
+    <a href="/sessions/new" class="btn btn-primary rounded-pill px-3 py-2 fw-semibold shadow-sm">
+      <i class="fa-solid fa-plus me-1"></i> Host a Session
+    </a>
+  </div>
+</div>
+
+<% if (sessions && sessions.length > 0) { %>
+  <div class="row g-4">
+    <% sessions.forEach(function(session) { %>
+      <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100 d-flex flex-column transition-hover">
+          <!-- Card Header with Sport & Slot Badge -->
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-2 rounded-pill fs-7">
+              <i class="fa-solid fa-medal me-1"></i> <%= session.sport ? session.sport.name : 'Sport' %>
+            </span>
+            <span class="badge bg-success text-white rounded-pill px-3 py-1 fw-semibold">
+              <i class="fa-solid fa-users me-1"></i> <%= session.getRemainingSlots() %> slots open
+            </span>
+          </div>
+
+          <!-- Session Details -->
+          <h5 class="fw-bold text-dark mb-2">
+            <%= session.sport ? session.sport.name : 'Match' %> Session
+          </h5>
+
+          <div class="vstack gap-2 mb-3 text-muted small">
+            <div class="d-flex align-items-center gap-2">
+              <i class="fa-solid fa-location-dot text-danger flex-shrink-0" style="width: 16px;"></i>
+              <span class="text-truncate fw-medium text-dark"><%= session.venue %></span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <i class="fa-regular fa-calendar text-primary flex-shrink-0" style="width: 16px;"></i>
+              <span><%= new Date(session.dateTime).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) %></span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <i class="fa-regular fa-clock text-info flex-shrink-0" style="width: 16px;"></i>
+              <span><%= new Date(session.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %></span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <i class="fa-regular fa-user text-secondary flex-shrink-0" style="width: 16px;"></i>
+              <span>Host: <strong class="text-dark"><%= session.creator ? session.creator.firstName : 'Player' %></strong></span>
+            </div>
+          </div>
+
+          <% if (session.existingPlayers) { %>
+            <div class="bg-light p-2 rounded-3 small text-muted mb-3">
+              <i class="fa-solid fa-circle-info text-muted me-1"></i>
+              <strong>Existing roster:</strong> <%= session.existingPlayers %>
+            </div>
+          <% } %>
+
+          <!-- Card Actions (Pushed to bottom) -->
+          <div class="mt-auto pt-3 border-top d-flex gap-2">
+            <a href="/sessions/<%= session.id %>" class="btn btn-outline-secondary rounded-pill px-3 flex-grow-1">
+              View Details
+            </a>
+            <form action="/sessions/<%= session.id %>/join" method="POST" class="flex-grow-1">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit" class="btn btn-success rounded-pill px-3 fw-bold w-100 shadow-sm">
+                <i class="fa-solid fa-user-plus me-1"></i> Join
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    <% }); %>
+  </div>
+<% } else { %>
+  <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white my-3">
+    <div class="icon-circle bg-light text-muted p-4 rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+      <i class="fa-regular fa-calendar-xmark fs-1 text-muted opacity-50"></i>
+    </div>
+    <h4 class="fw-bold mb-2">No Available Sessions</h4>
+    <p class="text-muted max-w-md mx-auto mb-4">
+      There are currently no open upcoming games looking for players. Why not create a session and invite players to join?
+    </p>
+    <div>
+      <a href="/sessions/new" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm">
+        <i class="fa-solid fa-plus me-1"></i> Create a Session
+      </a>
+    </div>
+  </div>
+<% } %>
+
+<%- include('../footer') %>
