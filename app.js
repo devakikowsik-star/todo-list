@@ -77,7 +77,8 @@ passport.use(
 
         return done(null, user);
       } catch (err) {
-        return done(err);
+        console.error('Passport login error:', err.message);
+        return done(null, false, { message: 'Database connecting or unavailable. Please ensure PostgreSQL is linked.' });
       }
     }
   )

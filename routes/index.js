@@ -101,6 +101,13 @@ router.post('/users', async (req, res, next) => {
         formData: req.body,
       });
     }
+    if (err.name && err.name.includes('SequelizeConnection')) {
+      req.flash('error', 'Database is currently connecting. Please ensure your PostgreSQL database is linked on Render.');
+      return res.status(500).render('signup', {
+        title: 'Sign Up - Sports Scheduler',
+        formData: req.body,
+      });
+    }
     next(err);
   }
 });

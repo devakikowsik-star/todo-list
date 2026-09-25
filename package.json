@@ -46,7 +46,6 @@
     "pg": "^8.13.3",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.5",
-    "sqlite3": "^6.0.1",
     "tiny-csrf": "^1.1.6"
   },
   "devDependencies": {

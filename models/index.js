@@ -31,12 +31,23 @@ if (process.env.DATABASE_URL) {
     },
   });
 } else {
-  // If DATABASE_URL is not set, use SQLite for zero-config operation
-  sequelize = new Sequelize({
-    dialect: 'sqlite',
-    storage: path.join(__dirname, '..', 'sports_scheduler.sqlite'),
-    logging: isTest ? false : console.log,
-  });
+  sequelize = new Sequelize(
+    process.env.DB_NAME || 'sports_scheduler_development',
+    process.env.DB_USER || 'postgres',
+    process.env.DB_PASSWORD || 'postgres',
+    {
+      host: process.env.DB_HOST || '127.0.0.1',
+      port: process.env.DB_PORT || 5432,
+      dialect: 'postgres',
+      logging: isTest ? false : console.log,
+      pool: {
+        max: 5,
+        min: 0,
+        acquire: 30000,
+        idle: 10000,
+      },
+    }
+  );
 }
 
 const db = {};
