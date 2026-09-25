@@ -14,8 +14,14 @@ router.get('/', async (req, res, next) => {
       return res.redirect('/dashboard');
     }
 
-    const totalSports = await Sport.count();
-    const totalSessions = await Session.count({ where: { isCancelled: false } });
+    let totalSports = 0;
+    let totalSessions = 0;
+    try {
+      totalSports = await Sport.count();
+      totalSessions = await Session.count({ where: { isCancelled: false } });
+    } catch (dbErr) {
+      console.warn('Database count query standby:', dbErr.message);
+    }
 
     res.render('home', {
       title: 'Sports Scheduler - Connect & Play',
