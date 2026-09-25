@@ -12,20 +12,22 @@ app.listen(PORT, '0.0.0.0', () => {
 
 // 2. Initialize database connection in the background without blocking port binding
 async function initializeDatabase() {
-  if (process.env.DATABASE_URL) {
-    try {
+  try {
+    if (process.env.DATABASE_URL) {
       console.log('Connecting to PostgreSQL database via DATABASE_URL...');
       await sequelize.authenticate();
-      console.log('Database connection established successfully.');
-
-      // Automatically sync models and create tables
-      await sequelize.sync();
-      console.log('Database tables synchronized successfully.');
-    } catch (error) {
-      console.error('Database connection error:', error.message);
+      console.log('PostgreSQL database connection established successfully.');
+    } else {
+      console.log('Initializing local database storage...');
+      await sequelize.authenticate();
+      console.log('Local database ready.');
     }
-  } else {
-    console.log('Notice: DATABASE_URL not configured. Web server running in standby mode.');
+
+    // Automatically create tables in Postgres or SQLite
+    await sequelize.sync();
+    console.log('All database tables synchronized successfully.');
+  } catch (error) {
+    console.error('Database connection error:', error.message);
   }
 }
 
