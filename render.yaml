@@ -10,7 +10,6 @@ services:
     env: node
     plan: free
     buildCommand: npm install
-    preDeployCommand: npx sequelize-cli db:migrate
     startCommand: node index.js
     envVars:
       - key: NODE_ENV
